@@ -48,6 +48,7 @@ export function BudgetForm({ budget, onSubmit, onCancel }: BudgetFormProps) {
         const data = await categoryApi.getAll("expense") // Only expense categories for budgets
         setCategories(data)
       } catch (error) {
+        console.error("Failed to fetch categories:", error)
         toast({
           title: "Error",
           description: "Failed to fetch categories",
@@ -71,6 +72,7 @@ export function BudgetForm({ budget, onSubmit, onCancel }: BudgetFormProps) {
         description: `Budget ${budget ? "updated" : "created"} successfully`,
       })
     } catch (error) {
+      console.error("Budget submission error:", error)
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Something went wrong",

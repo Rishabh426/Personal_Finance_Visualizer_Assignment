@@ -26,6 +26,15 @@ import { TransactionForm } from "@/components/transaction-form"
 import { useTransactions } from "@/hooks/use-transaction"
 import { useToast } from "@/hooks/use-toast"
 import type { ITransaction } from "@/lib/models/transaction.model"
+
+// Add this type definition
+type TransactionFormData = {
+  amount: number
+  description: string
+  category: string
+  date: Date
+  type: "income" | "expense"
+}
 import { PREDEFINED_CATEGORIES } from "@/lib/models/category.model"
 
 interface TransactionListProps {
@@ -65,7 +74,7 @@ export function TransactionList({ initialPage = 1 }: TransactionListProps) {
     setIsEditDialogOpen(true)
   }
 
-  const handleEditSubmit = async (data: any) => {
+  const handleEditSubmit = async (data: TransactionFormData) => {
     if (!editingTransaction) return
 
     try {
@@ -73,7 +82,7 @@ export function TransactionList({ initialPage = 1 }: TransactionListProps) {
       setIsEditDialogOpen(false)
       setEditingTransaction(null)
     } catch (error) {
-      // Error is handled in the hook
+      console.error("Failed to update transaction:", error)
     }
   }
 

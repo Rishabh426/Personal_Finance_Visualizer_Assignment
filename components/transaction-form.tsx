@@ -61,6 +61,7 @@ export function TransactionForm({ transaction, onSubmit, onCancel }: Transaction
         const data = await categoryApi.getAll(watchedType)
         setCategories(data)
       } catch (error) {
+        console.error("Failed to fetch categories:", error)
         toast({
           title: "Error",
           description: "Failed to fetch categories",
