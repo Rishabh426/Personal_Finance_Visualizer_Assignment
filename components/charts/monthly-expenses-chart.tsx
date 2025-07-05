@@ -4,12 +4,16 @@ import { useEffect, useState } from "react"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { analyticsApi } from "@/lib/api"
 
+interface ChartData {
+  month: string
+  total: number
+}
+
 export function MonthlyExpensesChart() {
-  const [data, setData] = useState<Array<{ month: string; total: number }>>([])
+  const [data, setData] = useState<ChartData[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -68,41 +72,24 @@ export function MonthlyExpensesChart() {
         <CardDescription>Your spending trend over the last 6 months</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer
-          config={{
-            total: {
-              label: "Total Expenses",
-              color: "hsl(var(--chart-1))",
-            },
-          }}
-          className="h-[300px]"
-        >
+        <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="month"
                 tick={{ fontSize: 12 }}
-                tickFormatter={(value) => {
+                tickFormatter={(value: string) => {
                   const [year, month] = value.split("-")
                   const date = new Date(Number.parseInt(year), Number.parseInt(month) - 1)
                   return date.toLocaleDateString("en-US", { month: "short" })
                 }}
               />
-              <YAxis tick={{ fontSize: 12 }} tickFormatter={(value) => `$${value}`} />
-              <ChartTooltip
-                content={<ChartTooltipContent />}
-                formatter={(value: number) => [`$${value.toFixed(2)}`, "Total Expenses"]}
-                labelFormatter={(label) => {
-                  const [year, month] = label.split("-")
-                  const date = new Date(Number.parseInt(year), Number.parseInt(month) - 1)
-                  return date.toLocaleDateString("en-US", { month: "long", year: "numeric" })
-                }}
-              />
-              <Bar dataKey="total" fill="var(--color-total)" radius={[4, 4, 0, 0]} />
+              <YAxis tick={{ fontSize: 12 }} tickFormatter={(value: number) => `$${value}`} />
+              <Bar dataKey="total" fill="#3b82f6" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-        </ChartContainer>
+        </div>
       </CardContent>
     </Card>
   )

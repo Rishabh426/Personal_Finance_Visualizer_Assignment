@@ -22,8 +22,19 @@ const COLORS = [
   "#AED6F1",
 ]
 
+interface ChartDataItem {
+  name: string
+  value: number
+  color: string
+}
+
+interface PieLabelProps {
+  name?: string
+  percent?: number
+}
+
 export function CategoryPieChart() {
-  const [data, setData] = useState<Array<{ name: string; value: number; color: string }>>([])
+  const [data, setData] = useState<ChartDataItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -33,7 +44,7 @@ export function CategoryPieChart() {
         setLoading(true)
         const result = await analyticsApi.getDashboardData()
 
-        const chartData = result.categoryBreakdown.map((item, index) => {
+        const chartData: ChartDataItem[] = result.categoryBreakdown.map((item, index) => {
           const category = PREDEFINED_CATEGORIES.find((cat) => cat.id === item._id)
           return {
             name: category?.name || item._id,
@@ -52,6 +63,11 @@ export function CategoryPieChart() {
 
     fetchData()
   }, [])
+
+  const renderCustomLabel = ({ name, percent }: PieLabelProps) => {
+    if (!name || percent === undefined) return ""
+    return `${name} ${(percent * 100).toFixed(0)}%`
+  }
 
   if (loading) {
     return (
@@ -112,7 +128,7 @@ export function CategoryPieChart() {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={renderCustomLabel}
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"

@@ -1,8 +1,11 @@
 import type mongoose from "mongoose"
 
+interface MongooseCache {
+  conn: typeof mongoose | null
+  promise: Promise<typeof mongoose> | null
+}
+
 declare global {
-  var mongooseInstance: {
-    conn: typeof mongoose | null
-    promise: Promise<typeof mongoose> | null
-  }
+  // eslint-disable-next-line no-var
+  var mongooseCache: MongooseCache | undefined
 }
