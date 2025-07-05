@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const month = searchParams.get("month")
     const year = searchParams.get("year")
 
-    const query: any = {}
+    const query: Partial<{ month: number; year: number }> = {}
     if (month) query.month = Number.parseInt(month)
     if (year) query.year = Number.parseInt(year)
 

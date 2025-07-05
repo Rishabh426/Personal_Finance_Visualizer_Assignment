@@ -17,7 +17,14 @@ export async function GET(request: NextRequest) {
     const endDate = searchParams.get("endDate")
 
     // Build query
-    const query: any = {}
+    const query: Partial<{
+      category: string
+      type: string
+      date: {
+        $gte?: Date
+        $lte?: Date
+      }
+    }> = {}
 
     if (category) query.category = category
     if (type) query.type = type
