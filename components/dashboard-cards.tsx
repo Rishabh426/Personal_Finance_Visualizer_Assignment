@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useEffect, useState } from "react"
 import { TrendingUp, TrendingDown, DollarSign, CreditCard } from "lucide-react"
 
@@ -7,13 +9,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { analyticsApi } from "@/lib/api"
 
+interface DashboardSummary {
+  totalIncome: number
+  totalExpenses: number
+  netIncome: number
+  transactionCount: number
+}
+
 interface DashboardData {
-  summary: {
-    totalIncome: number
-    totalExpenses: number
-    netIncome: number
-    transactionCount: number
-  }
+  summary: DashboardSummary
+}
+
+interface CardData {
+  title: string
+  value: number
+  icon: React.ComponentType<{ className?: string }>
+  color: string
+  bgColor: string
+  isCount?: boolean
 }
 
 export function DashboardCards() {
@@ -65,7 +78,7 @@ export function DashboardCards() {
     )
   }
 
-  const cards = [
+  const cards: CardData[] = [
     {
       title: "Total Income",
       value: data.summary.totalIncome,

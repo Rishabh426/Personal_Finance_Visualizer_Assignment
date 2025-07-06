@@ -3,6 +3,26 @@ import connectDB from "@/lib/db"
 import Transaction from "@/lib/models/transaction.model"
 import { successResponse, handleApiError } from "@/lib/utils/api-response"
 
+interface MonthlySummaryResult {
+  _id: "income" | "expense"
+  total: number
+  count: number
+}
+
+interface CategoryBreakdownResult {
+  _id: string
+  total: number
+  count: number
+}
+
+interface MonthlyTrendResult {
+  _id: {
+    year: number
+    month: number
+  }
+  total: number
+}
+
 export async function GET(request: NextRequest) {
   try {
     await connectDB()
@@ -15,7 +35,7 @@ export async function GET(request: NextRequest) {
     const endDate = new Date(year, month, 0, 23, 59, 59)
 
     // Monthly summary
-    const monthlySummary = await Transaction.aggregate([
+    const monthlySummary = (await Transaction.aggregate([
       {
         $match: {
           date: { $gte: startDate, $lte: endDate },
@@ -28,10 +48,10 @@ export async function GET(request: NextRequest) {
           count: { $sum: 1 },
         },
       },
-    ])
+    ])) as MonthlySummaryResult[]
 
     // Category breakdown
-    const categoryBreakdown = await Transaction.aggregate([
+    const categoryBreakdown = (await Transaction.aggregate([
       {
         $match: {
           date: { $gte: startDate, $lte: endDate },
@@ -48,13 +68,13 @@ export async function GET(request: NextRequest) {
       {
         $sort: { total: -1 },
       },
-    ])
+    ])) as CategoryBreakdownResult[]
 
     // Recent transactions
     const recentTransactions = await Transaction.find().sort({ date: -1 }).limit(5).lean()
 
     // Monthly expenses trend (last 6 months)
-    const monthlyTrend = await Transaction.aggregate([
+    const monthlyTrend = (await Transaction.aggregate([
       {
         $match: {
           type: "expense",
@@ -76,7 +96,7 @@ export async function GET(request: NextRequest) {
       {
         $sort: { "_id.year": 1, "_id.month": 1 },
       },
-    ])
+    ])) as MonthlyTrendResult[]
 
     const totalIncome = monthlySummary.find((item) => item._id === "income")?.total || 0
     const totalExpenses = monthlySummary.find((item) => item._id === "expense")?.total || 0

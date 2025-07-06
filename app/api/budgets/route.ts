@@ -5,6 +5,16 @@ import Transaction from "@/lib/models/transaction.model"
 import { successResponse, errorResponse, handleApiError } from "@/lib/utils/api-response"
 import { BudgetSchema } from "@/lib/utils/validation"
 
+interface BudgetQuery {
+  month?: number
+  year?: number
+}
+
+interface AggregationResult {
+  _id: null
+  total: number
+}
+
 export async function GET(request: NextRequest) {
   try {
     await connectDB()
@@ -13,7 +23,7 @@ export async function GET(request: NextRequest) {
     const month = searchParams.get("month")
     const year = searchParams.get("year")
 
-    const query: Partial<{ month: number; year: number }> = {}
+    const query: BudgetQuery = {}
     if (month) query.month = Number.parseInt(month)
     if (year) query.year = Number.parseInt(year)
 
@@ -25,7 +35,7 @@ export async function GET(request: NextRequest) {
         const startDate = new Date(budget.year, budget.month - 1, 1)
         const endDate = new Date(budget.year, budget.month, 0, 23, 59, 59)
 
-        const totalSpent = await Transaction.aggregate([
+        const totalSpent = (await Transaction.aggregate([
           {
             $match: {
               category: budget.category,
@@ -39,7 +49,7 @@ export async function GET(request: NextRequest) {
               total: { $sum: "$amount" },
             },
           },
-        ])
+        ])) as AggregationResult[]
 
         const spent = totalSpent[0]?.total || 0
 
@@ -65,7 +75,7 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB()
 
-    const body = await request.json()
+    const body: unknown = await request.json()
     const validatedData = BudgetSchema.parse(body)
 
     const budget = await Budget.create(validatedData)

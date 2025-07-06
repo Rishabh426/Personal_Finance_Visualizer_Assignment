@@ -13,9 +13,34 @@ interface UseTransactionsParams {
   endDate?: string
 }
 
+interface TransactionCreateData {
+  amount: number
+  description: string
+  category: string
+  date: Date
+  type: "income" | "expense"
+}
+
+interface TransactionUpdateData {
+  amount?: number
+  description?: string
+  category?: string
+  date?: Date
+  type?: "income" | "expense"
+}
+
+interface PaginationData {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+  hasNext: boolean
+  hasPrev: boolean
+}
+
 export function useTransactions(params?: UseTransactionsParams) {
   const [transactions, setTransactions] = useState<ITransaction[]>([])
-  const [pagination, setPagination] = useState({
+  const [pagination, setPagination] = useState<PaginationData>({
     page: 1,
     limit: 10,
     total: 0,
@@ -44,7 +69,7 @@ export function useTransactions(params?: UseTransactionsParams) {
     fetchTransactions()
   }, [params?.page, params?.limit, params?.category, params?.type, params?.startDate, params?.endDate])
 
-  const createTransaction = async (data: Omit<ITransaction, "_id" | "createdAt" | "updatedAt">) => {
+  const createTransaction = async (data: TransactionCreateData) => {
     try {
       await transactionApi.create(data)
       await fetchTransactions() // Refresh the list
@@ -53,7 +78,7 @@ export function useTransactions(params?: UseTransactionsParams) {
     }
   }
 
-  const updateTransaction = async (id: string, data: Partial<ITransaction>) => {
+  const updateTransaction = async (id: string, data: TransactionUpdateData) => {
     try {
       await transactionApi.update(id, data)
       await fetchTransactions() // Refresh the list

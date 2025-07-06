@@ -24,6 +24,48 @@ interface PaginatedResponse<T> {
   }
 }
 
+interface TransactionCreateData {
+  amount: number
+  description: string
+  category: string
+  date: Date
+  type: "income" | "expense"
+}
+
+interface TransactionUpdateData {
+  amount?: number
+  description?: string
+  category?: string
+  date?: Date
+  type?: "income" | "expense"
+}
+
+interface BudgetCreateData {
+  category: string
+  amount: number
+  month: number
+  year: number
+}
+
+interface BudgetUpdateData {
+  category?: string
+  amount?: number
+  month?: number
+  year?: number
+}
+
+interface AnalyticsData {
+  summary: {
+    totalIncome: number
+    totalExpenses: number
+    netIncome: number
+    transactionCount: number
+  }
+  categoryBreakdown: Array<{ _id: string; total: number; count: number }>
+  recentTransactions: ITransaction[]
+  monthlyTrend: Array<{ month: string; total: number }>
+}
+
 // Transaction API
 export const transactionApi = {
   async getAll(params?: {
@@ -56,7 +98,7 @@ export const transactionApi = {
     return result.data!
   },
 
-  async create(data: Omit<ITransaction, "_id" | "createdAt" | "updatedAt">): Promise<ITransaction> {
+  async create(data: TransactionCreateData): Promise<ITransaction> {
     const response = await fetch(`${API_BASE}/transactions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -68,7 +110,7 @@ export const transactionApi = {
     return result.data!
   },
 
-  async update(id: string, data: Partial<ITransaction>): Promise<ITransaction> {
+  async update(id: string, data: TransactionUpdateData): Promise<ITransaction> {
     const response = await fetch(`${API_BASE}/transactions/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -107,7 +149,7 @@ export const budgetApi = {
     return result.data!
   },
 
-  async create(data: Omit<IBudget, "_id" | "spent" | "createdAt" | "updatedAt">): Promise<IBudget> {
+  async create(data: BudgetCreateData): Promise<IBudget> {
     const response = await fetch(`${API_BASE}/budgets`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -119,7 +161,7 @@ export const budgetApi = {
     return result.data!
   },
 
-  async update(id: string, data: Partial<IBudget>): Promise<IBudget> {
+  async update(id: string, data: BudgetUpdateData): Promise<IBudget> {
     const response = await fetch(`${API_BASE}/budgets/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -157,26 +199,13 @@ export const categoryApi = {
 
 // Analytics API
 export const analyticsApi = {
-  async getDashboardData(
-    month?: number,
-    year?: number,
-  ): Promise<{
-    summary: {
-      totalIncome: number
-      totalExpenses: number
-      netIncome: number
-      transactionCount: number
-    }
-    categoryBreakdown: Array<{ _id: string; total: number; count: number }>
-    recentTransactions: ITransaction[]
-    monthlyTrend: Array<{ month: string; total: number }>
-  }> {
+  async getDashboardData(month?: number, year?: number): Promise<AnalyticsData> {
     const searchParams = new URLSearchParams()
     if (month) searchParams.append("month", month.toString())
     if (year) searchParams.append("year", year.toString())
 
     const response = await fetch(`${API_BASE}/analytics?${searchParams}`)
-    const result = await response.json()
+    const result: ApiResponse<AnalyticsData> = await response.json()
 
     if (!result.success) throw new Error(result.error)
     return result.data!

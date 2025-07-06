@@ -4,6 +4,15 @@ import Transaction from "@/lib/models/transaction.model"
 import { successResponse, errorResponse, handleApiError } from "@/lib/utils/api-response"
 import { TransactionSchema } from "@/lib/utils/validation"
 
+interface TransactionQuery {
+  category?: string
+  type?: string
+  date?: {
+    $gte?: Date
+    $lte?: Date
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     await connectDB()
@@ -17,17 +26,10 @@ export async function GET(request: NextRequest) {
     const endDate = searchParams.get("endDate")
 
     // Build query
-    const query: Partial<{
-      category: string
-      type: string
-      date: {
-        $gte?: Date
-        $lte?: Date
-      }
-    }> = {}
+    const query: TransactionQuery = {}
 
     if (category) query.category = category
-    if (type) query.type = type
+    if (type) query.type = type as "income" | "expense"
     if (startDate || endDate) {
       query.date = {}
       if (startDate) query.date.$gte = new Date(startDate)
@@ -63,7 +65,7 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB()
 
-    const body = await request.json()
+    const body: unknown = await request.json()
     const validatedData = TransactionSchema.parse(body)
 
     const transaction = await Transaction.create(validatedData)

@@ -9,6 +9,20 @@ interface UseBudgetsParams {
   year?: number
 }
 
+interface BudgetCreateData {
+  category: string
+  amount: number
+  month: number
+  year: number
+}
+
+interface BudgetUpdateData {
+  category?: string
+  amount?: number
+  month?: number
+  year?: number
+}
+
 export function useBudgets(params?: UseBudgetsParams) {
   const [budgets, setBudgets] = useState<IBudget[]>([])
   const [loading, setLoading] = useState(true)
@@ -31,7 +45,7 @@ export function useBudgets(params?: UseBudgetsParams) {
     fetchBudgets()
   }, [params?.month, params?.year])
 
-  const createBudget = async (data: Omit<IBudget, "_id" | "spent" | "createdAt" | "updatedAt">) => {
+  const createBudget = async (data: BudgetCreateData) => {
     try {
       await budgetApi.create(data)
       await fetchBudgets()
@@ -40,7 +54,7 @@ export function useBudgets(params?: UseBudgetsParams) {
     }
   }
 
-  const updateBudget = async (id: string, data: Partial<IBudget>) => {
+  const updateBudget = async (id: string, data: BudgetUpdateData) => {
     try {
       await budgetApi.update(id, data)
       await fetchBudgets()

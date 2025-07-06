@@ -12,6 +12,16 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { useBudgets } from "@/hooks/use-budget"
 import { BudgetForm } from "@/components/budget-form"
 
+interface BudgetFormData {
+  category: string
+  amount: number
+}
+
+interface BudgetStatus {
+  status: "exceeded" | "warning" | "good"
+  color: string
+}
+
 export default function BudgetsPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const currentDate = new Date()
@@ -23,7 +33,7 @@ export default function BudgetsPage() {
     year: currentYear,
   })
 
-  const handleAddBudget = async (data: any) => {
+  const handleAddBudget = async (data: BudgetFormData) => {
     try {
       await createBudget({
         ...data,
@@ -32,11 +42,12 @@ export default function BudgetsPage() {
       })
       setIsAddDialogOpen(false)
     } catch (error) {
+      console.error("Failed to create budget:", error)
       // Error is handled in the hook
     }
   }
 
-  const getBudgetStatus = (spent: number, amount: number) => {
+  const getBudgetStatus = (spent: number, amount: number): BudgetStatus => {
     const percentage = (spent / amount) * 100
     if (percentage >= 100) return { status: "exceeded", color: "bg-red-500" }
     if (percentage >= 80) return { status: "warning", color: "bg-yellow-500" }
