@@ -6,21 +6,48 @@ import { UpdateBudgetSchema } from "@/lib/utils/validation"
 import mongoose from "mongoose"
 
 interface RouteParams {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
-export async function PATCH(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: RouteParams) {
   try {
     await connectDB()
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    const { id } = await context.params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new ApiError("Invalid budget ID", 400)
     }
 
-    const body = await request.json()
+    const budget = await Budget.findById(id)
+
+    if (!budget) {
+      throw new ApiError("Budget not found", 404)
+    }
+
+    return successResponse(budget)
+  } catch (error) {
+    return handleApiError(error)
+  }
+}
+
+export async function PATCH(request: NextRequest, context: RouteParams) {
+  try {
+    await connectDB()
+
+    const { id } = await context.params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new ApiError("Invalid budget ID", 400)
+    }
+
+    const body: unknown = await request.json()
     const validatedData = UpdateBudgetSchema.parse(body)
 
-    const budget = await Budget.findByIdAndUpdate(params.id, validatedData, { new: true, runValidators: true })
+    const budget = await Budget.findByIdAndUpdate(id, validatedData, {
+      new: true,
+      runValidators: true,
+    })
 
     if (!budget) {
       throw new ApiError("Budget not found", 404)
@@ -35,15 +62,17 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     await connectDB()
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    const { id } = await context.params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new ApiError("Invalid budget ID", 400)
     }
 
-    const budget = await Budget.findByIdAndDelete(params.id)
+    const budget = await Budget.findByIdAndDelete(id)
 
     if (!budget) {
       throw new ApiError("Budget not found", 404)

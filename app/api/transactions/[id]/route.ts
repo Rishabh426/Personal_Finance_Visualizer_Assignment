@@ -6,18 +6,20 @@ import { UpdateTransactionSchema } from "@/lib/utils/validation"
 import mongoose from "mongoose"
 
 interface RouteParams {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: RouteParams) {
   try {
     await connectDB()
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    const { id } = await context.params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new ApiError("Invalid transaction ID", 400)
     }
 
-    const transaction = await Transaction.findById(params.id)
+    const transaction = await Transaction.findById(id)
 
     if (!transaction) {
       throw new ApiError("Transaction not found", 404)
@@ -29,18 +31,20 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function PATCH(request: NextRequest, { params }: RouteParams) {
+export async function PATCH(request: NextRequest, context: RouteParams) {
   try {
     await connectDB()
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    const { id } = await context.params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new ApiError("Invalid transaction ID", 400)
     }
 
-    const body = await request.json()
+    const body: unknown = await request.json()
     const validatedData = UpdateTransactionSchema.parse(body)
 
-    const transaction = await Transaction.findByIdAndUpdate(params.id, validatedData, {
+    const transaction = await Transaction.findByIdAndUpdate(id, validatedData, {
       new: true,
       runValidators: true,
     })
@@ -58,15 +62,17 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
   try {
     await connectDB()
 
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    const { id } = await context.params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new ApiError("Invalid transaction ID", 400)
     }
 
-    const transaction = await Transaction.findByIdAndDelete(params.id)
+    const transaction = await Transaction.findByIdAndDelete(id)
 
     if (!transaction) {
       throw new ApiError("Transaction not found", 404)
