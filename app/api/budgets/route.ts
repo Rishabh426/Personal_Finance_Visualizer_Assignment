@@ -1,7 +1,4 @@
 import type { NextRequest } from "next/server"
-import connectDB from "@/lib/db"
-import Budget from "@/lib/models/budget.model"
-import Transaction from "@/lib/models/transaction.model"
 import { successResponse, errorResponse, handleApiError } from "@/lib/utils/api-response"
 import { BudgetSchema } from "@/lib/utils/validation"
 
@@ -17,6 +14,11 @@ interface AggregationResult {
 
 export async function GET(request: NextRequest) {
   try {
+    // Dynamically import to avoid build-time execution
+    const connectDB = (await import("@/lib/db")).default
+    const Budget = (await import("@/lib/models/budget.model")).default
+    const Transaction = (await import("@/lib/models/transaction.model")).default
+
     await connectDB()
 
     const { searchParams } = new URL(request.url)
@@ -73,6 +75,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Dynamically import to avoid build-time execution
+    const connectDB = (await import("@/lib/db")).default
+    const Budget = (await import("@/lib/models/budget.model")).default
+
     await connectDB()
 
     const body: unknown = await request.json()

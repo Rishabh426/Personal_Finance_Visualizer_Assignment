@@ -73,12 +73,8 @@ npm install
 Create a `.env.local` file in the root directory:
 
 \`\`\`env
-# MongoDB Connection
+# MongoDB Connection (REQUIRED)
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/personal-finance?retryWrites=true&w=majority
-
-# Next.js Configuration
-NEXTAUTH_SECRET=your-secret-key-here
-NEXTAUTH_URL=http://localhost:3000
 \`\`\`
 
 ### 4. Initialize shadcn/ui (if not already done)
@@ -100,94 +96,6 @@ npm run dev
 
 Visit [http://localhost:3000](http://localhost:3000) to see the application.
 
-## 🗂️ Project Structure
-
-\`\`\`
-personal-finance-visualizer/
-├── app/                          # Next.js App Router
-│   ├── api/                      # API Routes
-│   │   ├── transactions/         # Transaction CRUD endpoints
-│   │   ├── budgets/             # Budget management endpoints
-│   │   ├── categories/          # Category endpoints
-│   │   └── analytics/           # Dashboard analytics
-│   ├── transactions/            # Transactions page
-│   ├── budgets/                 # Budgets page
-│   ├── layout.tsx               # Root layout
-│   ├── page.tsx                 # Dashboard page
-│   └── globals.css              # Global styles
-├── components/                   # React Components
-│   ├── ui/                      # shadcn/ui components
-│   ├── charts/                  # Chart components
-│   ├── transaction-form.tsx     # Transaction form
-│   ├── transaction-list.tsx     # Transaction list
-│   ├── budget-form.tsx          # Budget form
-│   └── dashboard-cards.tsx      # Dashboard summary cards
-├── hooks/                       # Custom React hooks
-│   ├── use-transactions.ts      # Transaction management
-│   ├── use-budgets.ts          # Budget management
-│   └── use-toast.ts            # Toast notifications
-├── lib/                         # Utility libraries
-│   ├── api.ts                   # API client functions
-│   ├── db.ts                    # MongoDB connection
-│   ├── models/                  # Mongoose models
-│   └── utils/                   # Utility functions
-├── types/                       # TypeScript type definitions
-└── README.md                    # Project documentation
-\`\`\`
-
-## 🔧 API Endpoints
-
-### Transactions
-- `GET /api/transactions` - List transactions (with pagination/filtering)
-- `POST /api/transactions` - Create new transaction
-- `GET /api/transactions/[id]` - Get single transaction
-- `PATCH /api/transactions/[id]` - Update transaction
-- `DELETE /api/transactions/[id]` - Delete transaction
-
-### Budgets
-- `GET /api/budgets` - List budgets with spending calculations
-- `POST /api/budgets` - Create new budget
-- `PATCH /api/budgets/[id]` - Update budget
-- `DELETE /api/budgets/[id]` - Delete budget
-
-### Categories
-- `GET /api/categories` - Get predefined categories
-- `GET /api/categories?type=expense` - Filter by type
-
-### Analytics
-- `GET /api/analytics` - Dashboard summary data
-
-## 🎨 UI Components
-
-### Pre-built Categories
-The application includes 15 predefined categories:
-
-**Expense Categories:**
-- 🍽️ Food & Dining
-- 🚗 Transportation  
-- 🛍️ Shopping
-- 🎬 Entertainment
-- 💡 Bills & Utilities
-- 🏥 Healthcare
-- 📚 Education
-- ✈️ Travel
-- 💪 Fitness & Sports
-- 📦 Other Expenses
-
-**Income Categories:**
-- 💰 Salary
-- 💻 Freelance
-- 📈 Investment
-- 🏢 Business
-- 💎 Other Income
-
-### Design System
-- **Colors**: Semantic color usage with CSS variables
-- **Typography**: Inter font with clear hierarchy
-- **Spacing**: Consistent Tailwind spacing scale
-- **Components**: Accessible shadcn/ui components
-- **Icons**: Lucide React icon library
-
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
@@ -207,8 +115,6 @@ The application includes 15 predefined categories:
 3. **Environment Variables in Vercel**
    \`\`\`
    MONGODB_URI=your_mongodb_connection_string
-   NEXTAUTH_SECRET=your_secret_key
-   NEXTAUTH_URL=https://your-app.vercel.app
    \`\`\`
 
 ### Manual Build

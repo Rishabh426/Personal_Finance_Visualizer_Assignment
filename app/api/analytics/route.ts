@@ -1,6 +1,4 @@
 import type { NextRequest } from "next/server"
-import connectDB from "@/lib/db"
-import Transaction from "@/lib/models/transaction.model"
 import { successResponse, handleApiError } from "@/lib/utils/api-response"
 
 interface MonthlySummaryResult {
@@ -25,6 +23,10 @@ interface MonthlyTrendResult {
 
 export async function GET(request: NextRequest) {
   try {
+    // Dynamically import to avoid build-time execution
+    const connectDB = (await import("@/lib/db")).default
+    const Transaction = (await import("@/lib/models/transaction.model")).default
+
     await connectDB()
 
     const { searchParams } = new URL(request.url)
