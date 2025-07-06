@@ -38,9 +38,17 @@ export function DashboardCards() {
     const fetchData = async () => {
       try {
         setLoading(true)
+        setError(null)
         const result = await analyticsApi.getDashboardData()
-        setData(result)
+
+        // Add null checks
+        if (result && result.summary) {
+          setData(result)
+        } else {
+          setError("Invalid data received from server")
+        }
       } catch (err) {
+        console.error("Dashboard data fetch error:", err)
         setError(err instanceof Error ? err.message : "Failed to fetch dashboard data")
       } finally {
         setLoading(false)
@@ -66,12 +74,12 @@ export function DashboardCards() {
     )
   }
 
-  if (error || !data) {
+  if (error || !data || !data.summary) {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardContent className="p-6">
-            <p className="text-red-600">Error loading dashboard data</p>
+            <p className="text-red-600">Error loading dashboard data: {error || "Invalid data"}</p>
           </CardContent>
         </Card>
       </div>

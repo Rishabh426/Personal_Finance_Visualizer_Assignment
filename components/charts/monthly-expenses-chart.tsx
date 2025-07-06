@@ -21,10 +21,20 @@ export function MonthlyExpensesChart() {
     const fetchData = async () => {
       try {
         setLoading(true)
+        setError(null)
         const result = await analyticsApi.getDashboardData()
-        setData(result.monthlyTrend)
+
+        // Add null checks and array validation
+        if (result && result.monthlyTrend && Array.isArray(result.monthlyTrend)) {
+          setData(result.monthlyTrend)
+        } else {
+          setError("No monthly trend data available")
+          setData([])
+        }
       } catch (err) {
+        console.error("Monthly chart fetch error:", err)
         setError(err instanceof Error ? err.message : "Failed to fetch chart data")
+        setData([])
       } finally {
         setLoading(false)
       }

@@ -52,7 +52,14 @@ export function TransactionList({ initialPage = 1 }: TransactionListProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   const { toast } = useToast()
-  const { transactions, pagination, loading, error, updateTransaction, deleteTransaction } = useTransactions({
+  const {
+    transactions = [],
+    pagination,
+    loading,
+    error,
+    updateTransaction,
+    deleteTransaction,
+  } = useTransactions({
     page,
     limit: 10,
     category: filters.category || undefined,
@@ -102,7 +109,7 @@ export function TransactionList({ initialPage = 1 }: TransactionListProps) {
     }
   }
 
-  const filteredTransactions = transactions.filter((transaction) => {
+  const filteredTransactions = (transactions || []).filter((transaction) => {
     if (filters.search) {
       return transaction.description.toLowerCase().includes(filters.search.toLowerCase())
     }

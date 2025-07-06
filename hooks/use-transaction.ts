@@ -56,10 +56,19 @@ export function useTransactions(params?: UseTransactionsParams) {
       setLoading(true)
       setError(null)
       const data = await transactionApi.getAll(params)
-      setTransactions(data.transactions)
-      setPagination(data.pagination)
+
+      // Add null checks
+      if (data && data.transactions && Array.isArray(data.transactions)) {
+        setTransactions(data.transactions)
+        setPagination(data.pagination)
+      } else {
+        setTransactions([])
+        setError("Invalid transaction data received")
+      }
     } catch (err) {
+      console.error("Fetch transactions error:", err)
       setError(err instanceof Error ? err.message : "Failed to fetch transactions")
+      setTransactions([]) // Reset to empty array on error
     } finally {
       setLoading(false)
     }

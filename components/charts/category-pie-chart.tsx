@@ -42,20 +42,29 @@ export function CategoryPieChart() {
     const fetchData = async () => {
       try {
         setLoading(true)
+        setError(null)
         const result = await analyticsApi.getDashboardData()
 
-        const chartData: ChartDataItem[] = result.categoryBreakdown.map((item, index) => {
-          const category = PREDEFINED_CATEGORIES.find((cat) => cat.id === item._id)
-          return {
-            name: category?.name || item._id,
-            value: item.total,
-            color: category?.color || COLORS[index % COLORS.length],
-          }
-        })
+        // Add null checks and array validation
+        if (result && result.categoryBreakdown && Array.isArray(result.categoryBreakdown)) {
+          const chartData: ChartDataItem[] = result.categoryBreakdown.map((item, index) => {
+            const category = PREDEFINED_CATEGORIES.find((cat) => cat.id === item._id)
+            return {
+              name: category?.name || item._id,
+              value: item.total,
+              color: category?.color || COLORS[index % COLORS.length],
+            }
+          })
 
-        setData(chartData)
+          setData(chartData)
+        } else {
+          setError("No category data available")
+          setData([])
+        }
       } catch (err) {
+        console.error("Category chart fetch error:", err)
         setError(err instanceof Error ? err.message : "Failed to fetch chart data")
+        setData([])
       } finally {
         setLoading(false)
       }

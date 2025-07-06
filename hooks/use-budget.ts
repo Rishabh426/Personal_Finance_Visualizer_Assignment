@@ -33,9 +33,18 @@ export function useBudgets(params?: UseBudgetsParams) {
       setLoading(true)
       setError(null)
       const data = await budgetApi.getAll(params)
-      setBudgets(data)
+
+      // Add null checks
+      if (data && Array.isArray(data)) {
+        setBudgets(data)
+      } else {
+        setBudgets([])
+        setError("Invalid budget data received")
+      }
     } catch (err) {
+      console.error("Fetch budgets error:", err)
       setError(err instanceof Error ? err.message : "Failed to fetch budgets")
+      setBudgets([]) // Reset to empty array on error
     } finally {
       setLoading(false)
     }
