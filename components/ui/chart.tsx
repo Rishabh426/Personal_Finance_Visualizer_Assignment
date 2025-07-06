@@ -17,7 +17,7 @@ const ChartContainer = React.forwardRef<
         dangerouslySetInnerHTML={{
           __html: Object.entries(config)
             .map(
-              ([key, value]) => `
+              () => `
               .recharts-default-tooltip .recharts-tooltip-label,
               .recharts-default-tooltip .recharts-tooltip-item-name {
                 color: hsl(var(--foreground));
